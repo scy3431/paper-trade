@@ -19,32 +19,32 @@ def check_dependencies():
     for package in required_packages:
         try:
             __import__(package)
-            print(f"✅ {package}")
+            print(f" {package}")
         except ImportError:
-            print(f"❌ {package} - not installed")
+            print(f" {package} - not installed")
             missing_packages.append(package)
     
     if missing_packages:
-        print(f"\n📦 Installing missing packages: {', '.join(missing_packages)}")
+        print(f"\n Installing missing packages: {', '.join(missing_packages)}")
         try:
             subprocess.check_call([sys.executable, '-m', 'pip', 'install', '-r', 'requirements.txt'])
-            print("✅ Dependencies installed successfully!")
+            print(" Dependencies installed successfully!")
         except subprocess.CalledProcessError:
-            print("❌ Failed to install dependencies. Please run: pip install -r requirements.txt")
+            print(" Failed to install dependencies. Please run: pip install -r requirements.txt")
             return False
     
     return True
 
 def start_app():
     """Start the Flask application"""
-    print("\n🚀 Starting Stock Trading Simulator...")
-    print("📊 Features:")
+    print("\n Starting Stock Trading Simulator...")
+    print(" Features:")
     print("   • Interactive stock charts with technical indicators")
     print("   • Paper trading with virtual money")
     print("   • Real-time portfolio tracking")
     print("   • No signup required")
     
-    print("\n🌐 Opening browser in 3 seconds...")
+    print("\n Opening browser in 3 seconds...")
     time.sleep(3)
     
     # Open browser
@@ -53,27 +53,28 @@ def start_app():
     except:
         print("💡 Please manually open: http://localhost:5000")
     
-    print("\n🎯 How to use:")
+    print("\n How to use:")
     print("   1. Enter a stock symbol (e.g., AAPL, MSFT, GOOGL)")
     print("   2. View the interactive chart and stock information")
     print("   3. Place buy/sell orders with your virtual money")
     print("   4. Track your portfolio performance")
     
-    print("\n⏹️  Press Ctrl+C to stop the server")
+    print("\n  Press Ctrl+C to stop the server")
     
     # Start Flask app
     try:
         subprocess.run([sys.executable, 'app.py'])
     except KeyboardInterrupt:
-        print("\n👋 Thanks for using Stock Trading Simulator!")
+        print("\n Thanks for using Stock Trading Simulator!")
 
 if __name__ == "__main__":
-    print("📈 Stock Trading Simulator")
+    print(" Stock Trading Simulator")
     print("=" * 40)
     
     if check_dependencies():
         start_app()
     else:
-        print("\n❌ Please install dependencies first:")
+        print("\n Please install dependencies first:")
         print("   pip install -r requirements.txt")
+
         sys.exit(1) 
