@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Trading Simulator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 20px;
+            margin-bottom: 20px;
+            min-height: 600px;
+        }
+
+        .chart-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+            margin: 20px 0;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .search-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .stock-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .info-item {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .info-item h4 {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .info-item .value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .trading-section {
+            margin-top: 20px;
+        }
+
+        .trade-form {
+            display: grid;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input, .form-group select {
+            padding: 10px;
+            border: 2px solid #e1e5e9;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .trade-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .portfolio-summary {
+            margin-bottom: 20px;
+        }
+
+        .portfolio-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #28a745;
+            margin-bottom: 10px;
+        }
+
+        .positions-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .position-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .position-item:last-child {
+            border-bottom: none;
+        }
+
+        .gain-positive {
+            color: #28a745;
+        }
+
+        .gain-negative {
+            color: #dc3545;
+        }
+
+        .transactions-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .transaction-item {
+            padding: 8px;
+            border-bottom: 1px solid #e1e5e9;
+            font-size: 0.9rem;
+        }
+
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                min-height: auto;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .search-section {
+                flex-direction: column;
+            }
+
+            .chart-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📈 Stock Trading Simulator</h1>
+            <p>Practice trading with virtual money - No signup required!</p>
+        </div>
+
+        <div class="search-section">
+            <input type="text" id="stockSearch" class="search-input" placeholder="Enter stock symbol (e.g., AAPL, MSFT, GOOGL)">
+            <button onclick="searchStock()" class="btn btn-primary">Search</button>
+        </div>
+
+        <div id="message"></div>
+
+        <div class="main-content">
+            <div class="chart-section">
+                <h2 id="stockTitle">Search for a stock to get started</h2>
+                <div id="stockInfo" class="stock-info" style="display: none;"></div>
+                <div id="loading" class="loading" style="display: none;">Loading...</div>
+                <div class="chart-container">
+                    <canvas id="stockChart" style="display: none;"></canvas>
+                </div>
+                
+                <div id="tradingSection" class="trading-section" style="display: none;">
+                    <h3>Place Trade</h3>
+                    <form class="trade-form" id="tradeForm">
+                        <div class="form-group">
+                            <label for="tradeAction">Action:</label>
+                            <select id="tradeAction" required>
+                                <option value="buy">Buy</option>
+                                <option value="sell">Sell</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="tradeShares">Number of Shares:</label>
+                            <input type="number" id="tradeShares" min="1" value="1" required>
+                        </div>
+                        <div class="trade-buttons">
+                            <button type="submit" class="btn btn-success">Execute Trade</button>
+                            <button type="button" onclick="updatePortfolio()" class="btn btn-primary">Refresh Portfolio</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="card">
+                    <h3>💰 Portfolio</h3>
+                    <div id="portfolioSummary" class="portfolio-summary">
+                        <div class="portfolio-value">$10,000.00</div>
+                        <div>Cash: $10,000.00</div>
+                    </div>
+                    <div id="positionsList" class="positions-list"></div>
+                </div>
+
+                <div class="card">
+                    <h3>📊 Recent Transactions</h3>
+                    <div id="transactionsList" class="transactions-list">
+                        <div style="text-align: center; color: #6c757d; padding: 20px;">
+                            No transactions yet
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>⚙️ Settings</h3>
+                    <div class="settings-section">
+                        <div class="form-group">
+                            <label for="cashBalance">Cash Balance:</label>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <input type="number" id="cashBalance" min="0" step="0.01" style="flex: 1;">
+                                <button onclick="updateCashBalance()" class="btn btn-primary" style="padding: 8px 12px; font-size: 12px;">Update</button>
+                            </div>
+                        </div>
+                        <div style="margin-top: 15px;">
+                            <button onclick="resetPortfolio()" class="btn btn-danger" style="width: 100%; font-size: 12px;">Reset Portfolio</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStock = null;
+        let stockChart = null;
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            updatePortfolio();
+            
+            // Add event listeners
+            document.getElementById('stockSearch').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchStock();
+                }
+            });
+
+            document.getElementById('tradeForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                executeTrade();
+            });
+
+            // Initialize cash balance input with current value
+            updateCashBalanceInput();
+        });
+
+        function showMessage(message, type = 'success') {
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = `<div class="${type}">${message}</div>`;
+            setTimeout(() => {
+                messageDiv.innerHTML = '';
+            }, 5000);
+        }
+
+        async function searchStock() {
+            const symbol = document.getElementById('stockSearch').value.trim().toUpperCase();
+            if (!symbol) return;
+
+            // Show loading state
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('stockChart').style.display = 'none';
+            document.getElementById('stockInfo').style.display = 'none';
+            document.getElementById('tradingSection').style.display = 'none';
+
+            try {
+                const response = await fetch(`/api/stock/${symbol}`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    currentStock = data;
+                    // Use requestAnimationFrame for smoother UI updates
+                    requestAnimationFrame(() => {
+                        displayStockData(data);
+                    });
+                } else {
+                    showMessage(data.error || 'Stock not found', 'error');
+                }
+            } catch (error) {
+                showMessage('Error fetching stock data', 'error');
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        function displayStockData(data) {
+            // Update title
+            document.getElementById('stockTitle').textContent = `${data.symbol} - ${data.info.name}`;
+
+            // Display stock info
+            const infoDiv = document.getElementById('stockInfo');
+            infoDiv.innerHTML = `
+                <div class="info-item">
+                    <h4>Current Price</h4>
+                    <div class="value">$${data.info.current_price.toFixed(2)}</div>
+                </div>
+                <div class="info-item">
+                    <h4>Sector</h4>
+                    <div class="value">${data.info.sector}</div>
+                </div>
+                <div class="info-item">
+                    <h4>Market Cap</h4>
+                    <div class="value">$${(data.info.market_cap / 1e9).toFixed(1)}B</div>
+                </div>
+                <div class="info-item">
+                    <h4>P/E Ratio</h4>
+                    <div class="value">${data.info.pe_ratio ? data.info.pe_ratio.toFixed(2) : 'N/A'}</div>
+                </div>
+            `;
+            infoDiv.style.display = 'grid';
+
+            // Create chart
+            createStockChart(data);
+
+            // Show trading section
+            document.getElementById('tradingSection').style.display = 'block';
+        }
+
+        function createStockChart(data) {
+            const ctx = document.getElementById('stockChart').getContext('2d');
+            
+            if (stockChart) {
+                stockChart.destroy();
+            }
+
+            // Optimize data for better performance
+            const chartData = {
+                labels: data.data.map(d => d.date),
+                datasets: [
+                    {
+                        label: 'Price',
+                        data: data.data.map(d => d.close),
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.1,
+                        pointRadius: 0,
+                        pointHoverRadius: 6
+                    },
+                    {
+                        label: 'SMA 20',
+                        data: data.data.map(d => d.sma_20),
+                        borderColor: '#ff6384',
+                        backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                        borderWidth: 1,
+                        fill: false,
+                        tension: 0.1,
+                        pointRadius: 0,
+                        pointHoverRadius: 4
+                    },
+                    {
+                        label: 'SMA 50',
+                        data: data.data.map(d => d.sma_50),
+                        borderColor: '#36a2eb',
+                        backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                        borderWidth: 1,
+                        fill: false,
+                        tension: 0.1,
+                        pointRadius: 0,
+                        pointHoverRadius: 4
+                    }
+                ]
+            };
+
+            stockChart = new Chart(ctx, {
+                type: 'line',
+                data: chartData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 750,
+                        easing: 'easeInOutQuart'
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 15
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: `${data.symbol} Stock Price (6 Months)`,
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#fff',
+                            bodyColor: '#fff',
+                            borderColor: '#667eea',
+                            borderWidth: 1
+                        }
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                maxTicksLimit: 10
+                            }
+                        },
+                        y: {
+                            beginAtZero: false,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toFixed(2);
+                                },
+                                maxTicksLimit: 8
+                            }
+                        }
+                    }
+                }
+            });
+
+            document.getElementById('stockChart').style.display = 'block';
+        }
+
+        async function executeTrade() {
+            if (!currentStock) return;
+
+            const action = document.getElementById('tradeAction').value;
+            const shares = parseInt(document.getElementById('tradeShares').value);
+            const symbol = currentStock.symbol;
+
+            try {
+                const response = await fetch('/api/trade', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: action,
+                        symbol: symbol,
+                        shares: shares
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showMessage(data.message, 'success');
+                    updatePortfolio();
+                } else {
+                    showMessage(data.error, 'error');
+                }
+            } catch (error) {
+                showMessage('Error executing trade', 'error');
+            }
+        }
+
+        async function updatePortfolio() {
+            try {
+                const response = await fetch('/api/portfolio');
+                const data = await response.json();
+
+                // Update portfolio summary
+                const summaryDiv = document.getElementById('portfolioSummary');
+                summaryDiv.innerHTML = `
+                    <div class="portfolio-value">$${data.total_value.toFixed(2)}</div>
+                    <div>Cash: $${data.cash.toFixed(2)}</div>
+                `;
+
+                // Update positions
+                const positionsDiv = document.getElementById('positionsList');
+                if (Object.keys(data.positions).length === 0) {
+                    positionsDiv.innerHTML = '<div style="text-align: center; color: #6c757d; padding: 20px;">No positions</div>';
+                } else {
+                    positionsDiv.innerHTML = '';
+                    for (const [symbol, position] of Object.entries(data.positions)) {
+                        const gainLoss = position.gain_loss || 0;
+                        const gainClass = gainLoss >= 0 ? 'gain-positive' : 'gain-negative';
+                        positionsDiv.innerHTML += `
+                            <div class="position-item">
+                                <div>
+                                    <strong>${symbol}</strong><br>
+                                    <small>${position.shares} shares @ $${position.avg_price.toFixed(2)}</small>
+                                </div>
+                                <div class="${gainClass}">
+                                    $${gainLoss.toFixed(2)}
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+
+                // Update transactions
+                const transactionsDiv = document.getElementById('transactionsList');
+                if (data.transactions.length === 0) {
+                    transactionsDiv.innerHTML = '<div style="text-align: center; color: #6c757d; padding: 20px;">No transactions yet</div>';
+                } else {
+                    transactionsDiv.innerHTML = '';
+                    data.transactions.reverse().forEach(transaction => {
+                        const date = new Date(transaction.timestamp).toLocaleDateString();
+                        const time = new Date(transaction.timestamp).toLocaleTimeString();
+                        transactionsDiv.innerHTML += `
+                            <div class="transaction-item">
+                                <div><strong>${transaction.action.toUpperCase()} ${transaction.symbol}</strong></div>
+                                <div>${transaction.shares} shares @ $${transaction.price.toFixed(2)}</div>
+                                <div style="font-size: 0.8rem; color: #6c757d;">${date} ${time}</div>
+                            </div>
+                        `;
+                    });
+                }
+
+                // Update cash balance input
+                updateCashBalanceInput();
+            } catch (error) {
+                showMessage('Error updating portfolio', 'error');
+            }
+        }
+
+        function updateCashBalanceInput() {
+            const cashBalanceInput = document.getElementById('cashBalance');
+            if (cashBalanceInput) {
+                // Get current cash from portfolio summary
+                const portfolioSummary = document.getElementById('portfolioSummary');
+                const cashText = portfolioSummary.querySelector('div:last-child').textContent;
+                const currentCash = parseFloat(cashText.replace('Cash: $', '').replace(',', ''));
+                cashBalanceInput.value = currentCash.toFixed(2);
+            }
+        }
+
+        async function updateCashBalance() {
+            const newBalance = parseFloat(document.getElementById('cashBalance').value);
+            
+            if (isNaN(newBalance) || newBalance < 0) {
+                showMessage('Please enter a valid cash balance', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/portfolio/update', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        cash_balance: newBalance
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showMessage(data.message, 'success');
+                    updatePortfolio();
+                } else {
+                    showMessage(data.error, 'error');
+                }
+            } catch (error) {
+                showMessage('Error updating cash balance', 'error');
+            }
+        }
+
+        async function resetPortfolio() {
+            if (confirm('Are you sure you want to reset your portfolio? This will clear all positions and transactions and set cash to $10,000.')) {
+                try {
+                    const response = await fetch('/api/portfolio/reset', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        showMessage(data.message, 'success');
+                        updatePortfolio();
+                    } else {
+                        showMessage(data.error, 'error');
+                    }
+                } catch (error) {
+                    showMessage('Error resetting portfolio', 'error');
+                }
+            }
+        }
+    </script>
+</body>
+</html> 
