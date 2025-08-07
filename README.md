@@ -1,8 +1,8 @@
-# 📈 Stock Trading Simulator
+# Stock Trading Simulator
 
 A beginner-friendly web application that lets users practice stock trading with virtual money. No signup required - just start trading immediately!
 
-## ✨ Features
+## Features
 
 - **Interactive Stock Charts**: View real-time stock data with 6-month historical charts
 - **Technical Indicators**: Built-in SMA (Simple Moving Average) 20 and 50-day lines, plus RSI (Relative Strength Index)
@@ -12,7 +12,7 @@ A beginner-friendly web application that lets users practice stock trading with 
 - **Clean Interface**: Modern, responsive design that works on desktop and mobile
 - **No Registration**: Start trading immediately without any signup process
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 - Python 3.7 or higher
@@ -37,7 +37,7 @@ A beginner-friendly web application that lets users practice stock trading with 
    http://localhost:5000
    ```
 
-## 🎯 How to Use
+## How to Use
 
 ### Getting Started
 1. **Search for a stock**: Enter a stock symbol (e.g., AAPL, MSFT, GOOGL, TSLA) in the search box
@@ -56,14 +56,14 @@ A beginner-friendly web application that lets users practice stock trading with 
 - **SMA 50**: 50-day Simple Moving Average (blue line)
 - **Price Chart**: Actual stock price (purple line)
 
-## 📊 Supported Stocks
+## Supported Stocks
 
 The app works with any stock symbol available on Yahoo Finance, including:
 - **Tech**: AAPL, MSFT, GOOGL, AMZN, TSLA, META, NVDA, AMD
 - **Entertainment**: NFLX, DIS
-- **And many more!**
+- **And more!**
 
-## 🛠️ Technical Details
+## Technical Details
 
 ### Backend
 - **Flask**: Web framework for the API
@@ -75,7 +75,7 @@ The app works with any stock symbol available on Yahoo Finance, including:
 - **HTML5/CSS3**: Modern, responsive design
 - **JavaScript**: Interactive charts and real-time updates
 - **Chart.js**: Beautiful, interactive stock charts
-- **No external frameworks**: Lightweight and fast
+- **No external frameworks**
 
 ### API Endpoints
 - `GET /api/stock/<symbol>`: Get stock data and technical indicators
@@ -83,7 +83,7 @@ The app works with any stock symbol available on Yahoo Finance, including:
 - `POST /api/trade`: Execute buy/sell trades
 - `GET /api/search/<query>`: Search for stocks
 
-## 🎨 Features in Detail
+## Features in Detail
 
 ### Interactive Charts
 - 6-month historical price data
@@ -103,7 +103,7 @@ The app works with any stock symbol available on Yahoo Finance, including:
 - Insufficient funds protection
 - Position averaging for multiple buys
 
-## 🔧 Customization
+## Customization
 
 ### Starting Balance
 To change the starting cash amount, edit the `user_portfolio` variable in `app.py`:
@@ -121,14 +121,6 @@ To change the historical data period, modify the `timedelta` in the `get_stock_d
 start_date = end_date - timedelta(days=180)  # Change 180 to desired days
 ```
 
-## 🚨 Important Notes
-
-- **Virtual Trading Only**: This is a simulation - no real money is involved
-- **Data Source**: Stock data comes from Yahoo Finance API
-- **No Persistence**: Portfolio data resets when you restart the application
-- **Educational Purpose**: Designed for learning and practice
-
-## 🐛 Troubleshooting
 
 ### Common Issues
 
@@ -151,28 +143,6 @@ pip install --upgrade pip
 pip install -r requirements.txt --force-reinstall
 ```
 
-## 📈 Learning Resources
-
-This simulator is perfect for learning about:
-- Stock market basics
-- Technical analysis
-- Portfolio management
-- Risk management
-- Trading psychology
-
-## 🤝 Contributing
-
-Feel free to enhance this project by adding:
-- More technical indicators (MACD, Bollinger Bands, etc.)
-- Portfolio performance analytics
-- Watchlist functionality
-- Export features
-- Mobile app version
-
-## 📄 License
-
-This project is open source and available under the MIT License.
 
 ---
 
-**Happy Trading! 📈💰** 
