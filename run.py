@@ -13,7 +13,7 @@ def check_dependencies():
     """Check if required packages are installed"""
     required_packages = ['flask', 'yfinance', 'pandas', 'numpy']
     
-    print("🔍 Checking dependencies...")
+    print("Checking dependencies...")
     missing_packages = []
     
     for package in required_packages:
@@ -78,3 +78,4 @@ if __name__ == "__main__":
         print("   pip install -r requirements.txt")
 
         sys.exit(1) 
+
